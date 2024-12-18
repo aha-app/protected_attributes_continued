@@ -11,7 +11,7 @@ module ActionController
         return super if @include_set
 
         m = model
-        synchronize do
+        @mutex.synchronize do
           return super if @include_set
 
           @include_set = true
