@@ -1,6 +1,12 @@
 module ActiveRecord
   module MassAssignmentSecurity
     module Core
+      ALLOWED_CLASSES = [
+        'ActionController::Parameters',
+        'ActiveSupport::HashWithIndifferentAccess',
+        'Audited::AuditChanges',
+        'Hash',
+      ].to_set.freeze
 
       def initialize(attributes = nil, options = {})
         @new_record = true
@@ -19,8 +25,12 @@ module ActiveRecord
 
       private
 
-      def init_attributes(attributes, options)
-        assign_attributes(attributes, options)
+      def init_attributes(attributes, options = {})
+        if ALLOWED_CLASSES.include?(attributes.class.to_s)
+          assign_attributes(attributes, options)
+        else
+          super(attributes)
+        end
       end
 
       def init_internals
